@@ -1,0 +1,2297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Baitul Mukarram Jame Masjid</title>
+    <script src="https://js.stripe.com/v3/"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=Noto+Sans+Bengali:wght@300;400;500;600;700&family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --primary: #1a5e4a;
+            --primary-light: #2d8268;
+            --primary-ultra: #e8f4f0;
+            --accent: #c9a84c;
+            --accent-light: #f5edda;
+            --bg: #fafaf8;
+            --bg-card: #ffffff;
+            --bg-sidebar: #ffffff;
+            --surface: #f4f3ef;
+            --surface2: #eeece7;
+            --text: #1a1a18;
+            --text-2: #5a5a52;
+            --text-3: #9a9a8e;
+            --border: rgba(26,26,24,0.08);
+            --border-strong: rgba(26,26,24,0.14);
+            --shadow-sm: 0 1px 4px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+            --shadow: 0 4px 24px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04);
+            --shadow-lg: 0 16px 48px rgba(0,0,0,0.12), 0 4px 16px rgba(0,0,0,0.06);
+            --sidebar-w: 260px;
+            --radius: 16px;
+            --radius-sm: 10px;
+        }
+
+        [data-theme="dark"] {
+            --bg: #111110;
+            --bg-card: #1c1c1a;
+            --bg-sidebar: #161614;
+            --surface: #222220;
+            --surface2: #2a2a27;
+            --text: #f0efe8;
+            --text-2: #a8a89a;
+            --text-3: #666660;
+            --border: rgba(255,255,255,0.08);
+            --border-strong: rgba(255,255,255,0.14);
+            --shadow-sm: 0 1px 4px rgba(0,0,0,0.3), 0 4px 16px rgba(0,0,0,0.2);
+            --shadow: 0 4px 24px rgba(0,0,0,0.4);
+            --shadow-lg: 0 16px 48px rgba(0,0,0,0.5);
+            --primary-ultra: rgba(26,94,74,0.2);
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        body[lang="bn"] { font-family: 'Noto Sans Bengali', sans-serif; }
+        body[lang="ar"] { font-family: 'Noto Naskh Arabic', serif; direction: rtl; }
+
+        /* ── LAYOUT ── */
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ── SIDEBAR ── */
+        .sidebar {
+            width: var(--sidebar-w);
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            top: 0; left: 0; bottom: 0;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            transition: transform 0.35s cubic-bezier(0.4,0,0.2,1), background 0.3s;
+            overflow-y: auto;
+        }
+
+        .sidebar-brand {
+            padding: 28px 24px 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .brand-icon {
+            width: 44px;
+            height: 44px;
+            background: var(--primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            margin-bottom: 12px;
+        }
+
+        .brand-name {
+            font-family: 'DM Serif Display', serif;
+            font-size: 17px;
+            line-height: 1.2;
+            color: var(--text);
+            letter-spacing: -0.01em;
+        }
+
+        .brand-sub {
+            font-size: 11px;
+            color: var(--text-3);
+            margin-top: 2px;
+            font-weight: 500;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .sidebar-nav {
+            padding: 16px 12px;
+            flex: 1;
+        }
+
+        .nav-label {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-3);
+            padding: 8px 12px 6px;
+            margin-top: 8px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-2);
+            font-size: 14px;
+            font-weight: 500;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            margin-bottom: 2px;
+            position: relative;
+        }
+
+        .nav-item:hover {
+            background: var(--surface);
+            color: var(--text);
+        }
+
+        .nav-item.active {
+            background: var(--primary-ultra);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 20px;
+            background: var(--primary);
+            border-radius: 0 3px 3px 0;
+        }
+
+        .nav-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+            background: transparent;
+            transition: background 0.2s;
+        }
+
+        .nav-item.active .nav-icon {
+            background: var(--primary);
+            filter: saturate(0) brightness(10);
+        }
+
+        .nav-donate {
+            margin: 12px;
+            background: var(--primary);
+            color: white;
+            border-radius: var(--radius-sm);
+            padding: 13px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s;
+            border: none;
+            width: calc(100% - 24px);
+        }
+
+        .nav-donate:hover {
+            background: var(--primary-light);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow);
+        }
+
+        .sidebar-footer {
+            padding: 16px 12px;
+            border-top: 1px solid var(--border);
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.4);
+            z-index: 99;
+            backdrop-filter: blur(4px);
+        }
+
+        /* ── TOPBAR (mobile) ── */
+        .topbar {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: 56px;
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            z-index: 98;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            backdrop-filter: blur(20px);
+        }
+
+        .topbar-brand {
+            font-family: 'DM Serif Display', serif;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .hamburger-btn {
+            width: 36px; height: 36px;
+            background: var(--surface);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .hamburger-btn span {
+            width: 16px; height: 1.5px;
+            background: var(--text);
+            transition: all 0.3s;
+        }
+
+        /* ── MAIN CONTENT ── */
+        .main {
+            margin-left: var(--sidebar-w);
+            flex: 1;
+            min-height: 100vh;
+        }
+
+        /* ── PAGE SYSTEM ── */
+        .page { display: none; }
+        .page.active { display: block; }
+
+        /* ── HERO ── */
+        .hero {
+            min-height: 100vh;
+            position: relative;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            background: var(--bg);
+        }
+
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            background: 
+                radial-gradient(ellipse 80% 60% at 60% 40%, rgba(26,94,74,0.07) 0%, transparent 70%),
+                radial-gradient(ellipse 50% 40% at 80% 80%, rgba(201,168,76,0.05) 0%, transparent 60%);
+        }
+
+        .hero-pattern {
+            position: absolute;
+            inset: 0;
+            opacity: 0.025;
+            background-image: 
+                repeating-linear-gradient(45deg, var(--primary) 0, var(--primary) 1px, transparent 0, transparent 50%);
+            background-size: 20px 20px;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            padding: 80px 64px;
+            max-width: 700px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: heroIn 0.9s cubic-bezier(0.4,0,0.2,1) forwards 0.1s;
+        }
+
+        @keyframes heroIn {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--primary-ultra);
+            color: var(--primary);
+            font-size: 12px;
+            font-weight: 600;
+            padding: 6px 14px;
+            border-radius: 100px;
+            margin-bottom: 28px;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            border: 1px solid rgba(26,94,74,0.15);
+        }
+
+        .hero h1 {
+            font-family: 'DM Serif Display', serif;
+            font-size: clamp(52px, 6vw, 80px);
+            line-height: 1.05;
+            letter-spacing: -0.02em;
+            margin-bottom: 24px;
+            color: var(--text);
+        }
+
+        .hero h1 em {
+            font-style: italic;
+            color: var(--primary);
+        }
+
+        .hero p {
+            font-size: 18px;
+            line-height: 1.65;
+            color: var(--text-2);
+            margin-bottom: 40px;
+            max-width: 520px;
+            font-weight: 400;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .hero-image {
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 45%;
+            overflow: hidden;
+        }
+
+        .hero-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.85;
+        }
+        .hero-image img {
+    border-top-left-radius: 32px;
+    border-bottom-left-radius: 32px;
+}
+
+        .hero-image::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, var(--bg) 0%, transparent 40%);
+            z-index: 1;
+        }
+
+        .hero-image-placeholder {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 120px;
+            opacity: 0.3;
+        }
+
+        /* ── BUTTONS ── */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 13px 24px;
+            border-radius: 100px;
+            font-size: 15px;
+            font-weight: 600;
+            font-family: 'DM Sans', sans-serif;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-light);
+            transform: translateY(-1px);
+            box-shadow: 0 8px 24px rgba(26,94,74,0.3);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--text);
+            border: 1.5px solid var(--border-strong);
+        }
+
+        .btn-outline:hover {
+            background: var(--surface);
+            transform: translateY(-1px);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--primary);
+            padding: 0;
+            font-size: 14px;
+        }
+
+        /* ── SECTION ── */
+        .section {
+            padding: 72px 64px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .section-eyebrow {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--primary);
+            margin-bottom: 12px;
+        }
+
+        .section-title {
+            font-family: 'DM Serif Display', serif;
+            font-size: clamp(36px, 4vw, 52px);
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+            margin-bottom: 16px;
+            color: var(--text);
+        }
+
+        .section-sub {
+            font-size: 17px;
+            color: var(--text-2);
+            margin-bottom: 52px;
+            max-width: 520px;
+            line-height: 1.6;
+        }
+
+        /* ── PRAYER TIMES ── */
+        .prayer-strip {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .prayer-strip-header {
+            padding: 24px 32px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .prayer-strip-header h3 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 22px;
+        }
+
+        .prayer-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+        }
+
+        .prayer-item {
+            padding: 28px 16px;
+            text-align: center;
+            border-right: 1px solid var(--border);
+            transition: background 0.2s;
+            position: relative;
+        }
+
+        .prayer-item:last-child { border-right: none; }
+        .prayer-item:hover { background: var(--surface); }
+
+        .prayer-item.current {
+            background: var(--primary);
+            color: white;
+        }
+
+        .prayer-item.current .prayer-name,
+        .prayer-item.current .prayer-time {
+            color: white;
+        }
+
+        .prayer-item.current .prayer-icon { filter: none; }
+
+        .prayer-icon {
+            font-size: 28px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .prayer-name {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text-3);
+            margin-bottom: 6px;
+        }
+
+        .prayer-time {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text);
+            letter-spacing: -0.02em;
+            font-family: 'DM Serif Display', serif;
+        }
+
+        /* ── SERVICES ── */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .service-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 36px 28px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: var(--primary);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s;
+        }
+
+        .service-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: transparent;
+        }
+
+        .service-card:hover::before { transform: scaleX(1); }
+
+        .service-icon-wrap {
+            width: 52px;
+            height: 52px;
+            background: var(--primary-ultra);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .service-card h3 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 22px;
+            margin-bottom: 10px;
+            color: var(--text);
+        }
+
+        .service-card p {
+            font-size: 15px;
+            line-height: 1.6;
+            color: var(--text-2);
+        }
+
+        /* ── GALLERY ── */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: auto auto;
+            gap: 16px;
+        }
+
+        .gallery-item {
+            border-radius: var(--radius);
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+            background: var(--surface);
+        }
+
+        .gallery-item:first-child {
+            grid-column: span 2;
+            aspect-ratio: 16/9;
+        }
+
+        .gallery-item:not(:first-child) {
+            aspect-ratio: 4/3;
+        }
+
+        .gallery-item img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s cubic-bezier(0.4,0,0.2,1);
+        }
+
+        .gallery-item:hover img { transform: scale(1.05); }
+
+        .gallery-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .gallery-item:hover .gallery-overlay { opacity: 1; }
+
+        .gallery-label {
+            position: absolute;
+            bottom: 16px; left: 16px;
+            color: white;
+            font-weight: 600;
+            font-size: 15px;
+            opacity: 0;
+            transform: translateY(8px);
+            transition: all 0.3s;
+        }
+
+        .gallery-item:hover .gallery-label {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .gallery-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 56px;
+            color: var(--text-3);
+            background: linear-gradient(135deg, var(--surface), var(--surface2));
+            min-height: 200px;
+        }
+
+        /* ── STATS ── */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1px;
+            background: var(--border);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            margin-bottom: 80px;
+        }
+
+        .stat-item {
+            background: var(--bg-card);
+            padding: 40px 32px;
+            text-align: center;
+        }
+
+        .stat-num {
+            font-family: 'DM Serif Display', serif;
+            font-size: 48px;
+            color: var(--primary);
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-2);
+            font-weight: 500;
+        }
+
+        /* ── EVENTS ── */
+        .event-list { display: flex; flex-direction: column; gap: 12px; }
+
+        .event-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            transition: all 0.2s;
+        }
+
+        .event-card:hover {
+            border-color: var(--primary);
+            transform: translateX(4px);
+        }
+
+        .event-date-badge {
+            background: var(--primary-ultra);
+            border-radius: 10px;
+            padding: 10px 14px;
+            text-align: center;
+            min-width: 56px;
+            flex-shrink: 0;
+        }
+
+        .event-date-day {
+            font-family: 'DM Serif Display', serif;
+            font-size: 24px;
+            color: var(--primary);
+            line-height: 1;
+        }
+
+        .event-date-mon {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--primary);
+            margin-top: 2px;
+        }
+
+        .event-icon { font-size: 24px; }
+
+        .event-info { flex: 1; }
+
+        .event-title {
+            font-weight: 700;
+            font-size: 16px;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+
+        .event-meta {
+            font-size: 13px;
+            color: var(--text-3);
+        }
+
+        /* ── CALENDAR ── */
+        .calendar-wrap {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 40px;
+        }
+
+        .calendar-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .calendar-title {
+            font-family: 'DM Serif Display', serif;
+            font-size: 20px;
+        }
+
+        .cal-btn {
+            width: 36px; height: 36px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .cal-btn:hover { background: var(--surface2); }
+
+        .calendar-grid-wrap { padding: 16px; }
+
+        .cal-days-header {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            margin-bottom: 8px;
+        }
+
+        .cal-day-label {
+            text-align: center;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text-3);
+            padding: 6px 0;
+        }
+
+        .cal-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s;
+            position: relative;
+            color: var(--text);
+        }
+
+        .calendar-day:hover { background: var(--surface); }
+
+        .calendar-day.today {
+            background: var(--primary);
+            color: white;
+            font-weight: 700;
+        }
+
+        .calendar-day.has-event::after {
+            content: '';
+            position: absolute;
+            bottom: 3px;
+            width: 4px; height: 4px;
+            background: var(--accent);
+            border-radius: 50%;
+        }
+
+        .calendar-day.today::after { background: white; }
+
+        /* ── DONATE ── */
+        .donate-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: start;
+        }
+
+        .donate-sidebar-info h2 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 36px;
+            margin-bottom: 16px;
+        }
+
+        .donate-sidebar-info p {
+            font-size: 16px;
+            line-height: 1.7;
+            color: var(--text-2);
+            margin-bottom: 32px;
+        }
+
+        .impact-items { display: flex; flex-direction: column; gap: 16px; }
+
+        .impact-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 16px 20px;
+        }
+
+        .impact-icon {
+            width: 44px; height: 44px;
+            background: var(--primary-ultra);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .impact-text strong { font-size: 15px; display: block; margin-bottom: 2px; }
+        .impact-text span { font-size: 13px; color: var(--text-3); }
+
+        .donate-form-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 36px;
+            box-shadow: var(--shadow);
+        }
+
+        .category-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 28px;
+            background: var(--surface);
+            padding: 4px;
+            border-radius: 10px;
+        }
+
+        .cat-tab {
+            flex: 1;
+            padding: 9px 12px;
+            border-radius: 7px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            color: var(--text-2);
+            transition: all 0.2s;
+            font-family: 'DM Sans', sans-serif;
+            text-align: center;
+        }
+
+        .cat-tab.active {
+            background: var(--bg-card);
+            color: var(--primary);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .amount-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .amount-btn {
+            padding: 14px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            background: var(--surface);
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'DM Serif Display', serif;
+            color: var(--text);
+        }
+
+        .amount-btn:hover { border-color: var(--primary); color: var(--primary); }
+
+        .amount-btn.selected {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .form-group { margin-bottom: 18px; }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-2);
+            margin-bottom: 7px;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            background: var(--surface);
+            color: var(--text);
+            font-size: 15px;
+            font-family: 'DM Sans', sans-serif;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: var(--bg-card);
+        }
+
+        textarea.form-input { resize: vertical; min-height: 120px; }
+
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 100px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'DM Sans', sans-serif;
+            margin-top: 8px;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            background: var(--primary-light);
+            transform: translateY(-1px);
+            box-shadow: 0 8px 24px rgba(26,94,74,0.25);
+        }
+
+        #card-element {
+            padding: 14px 16px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            background: var(--surface);
+        }
+
+/* ── REDUCED MOTION MODE ── */
+body.animations-disabled *,
+body.animations-disabled *::before,
+body.animations-disabled *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+}
+
+body.animations-disabled .hero-content,
+body.animations-disabled .fade-up {
+    opacity: 1 !important;
+    transform: none !important;
+}
+
+        /* ── CONTACT ── */
+        .contact-layout {
+            display: grid;
+            grid-template-columns: 1fr 1.4fr;
+            gap: 40px;
+            align-items: start;
+        }
+
+        .contact-info { display: flex; flex-direction: column; gap: 16px; }
+
+        .info-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 20px 24px;
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+        }
+
+        .info-icon {
+            width: 44px; height: 44px;
+            background: var(--primary-ultra);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .info-label {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-3);
+            margin-bottom: 4px;
+        }
+
+        .info-val {
+            font-size: 15px;
+            color: var(--text);
+            font-weight: 500;
+            line-height: 1.5;
+        }
+
+        .info-val a { color: var(--primary); text-decoration: none; }
+
+        .map-card {
+            border-radius: var(--radius);
+            overflow: hidden;
+            border: 1px solid var(--border);
+            height: 200px;
+        }
+
+        .map-card iframe { width: 100%; height: 100%; border: none; }
+
+        .contact-form-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 36px;
+            box-shadow: var(--shadow);
+        }
+
+        .contact-form-card h3 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 28px;
+            margin-bottom: 28px;
+        }
+
+        /* ── PAGE HEADERS ── */
+        .page-hero {
+            padding: 80px 64px 48px;
+            background: linear-gradient(180deg, var(--surface) 0%, var(--bg) 100%);
+            border-bottom: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-hero::before {
+            content: '';
+            position: absolute;
+            top: -40px; right: -40px;
+            width: 300px; height: 300px;
+            background: radial-gradient(circle, rgba(26,94,74,0.08) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .page-hero-eyebrow {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--primary);
+            margin-bottom: 12px;
+        }
+
+        .page-hero h1 {
+            font-family: 'DM Serif Display', serif;
+            font-size: clamp(40px, 5vw, 64px);
+            line-height: 1.05;
+            letter-spacing: -0.02em;
+            margin-bottom: 16px;
+        }
+
+        .page-hero p {
+            font-size: 18px;
+            color: var(--text-2);
+            max-width: 520px;
+            line-height: 1.6;
+        }
+
+        /* ── PRAYER PAGE FULL ── */
+        .prayer-full-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .prayer-full-header {
+            padding: 32px 40px;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .prayer-full-header h2 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 28px;
+        }
+
+        .prayer-full-header p {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-top: 4px;
+        }
+
+        .prayer-full-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .prayer-full-item {
+            padding: 36px 24px;
+            text-align: center;
+            border-right: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            transition: background 0.2s;
+        }
+
+        .prayer-full-item:hover { background: var(--surface); }
+        .prayer-full-item:nth-child(3n) { border-right: none; }
+        .prayer-full-item:nth-last-child(-n+3) { border-bottom: none; }
+
+        .prayer-full-item.current {
+            background: var(--primary-ultra);
+        }
+
+        /* ── SETTINGS BTN ── */
+        .settings-btn {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 48px;
+            height: 48px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.2s;
+            color: var(--text-2);
+        }
+
+        .settings-btn:hover {
+            transform: scale(1.08);
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* ── SETTINGS PANEL ── */
+        .settings-panel {
+            position: fixed;
+            bottom: 82px;
+            right: 24px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 22px;
+            box-shadow: var(--shadow-lg);
+            z-index: 200;
+            width: 260px;
+            opacity: 0;
+            transform: translateY(12px) scale(0.97);
+            pointer-events: none;
+            transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
+        }
+
+        .settings-panel.active {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: all;
+        }
+
+        .settings-title {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--text);
+            letter-spacing: -0.01em;
+        }
+
+        .setting-block { margin-bottom: 18px; }
+
+        .setting-label {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text-3);
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .theme-toggle { display: flex; gap: 6px; }
+
+        .theme-btn {
+            flex: 1;
+            padding: 9px 10px;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            background: var(--surface);
+            color: var(--text-2);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 13px;
+            font-weight: 600;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .theme-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .lang-select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            background: var(--surface);
+            color: var(--text);
+            font-size: 14px;
+            font-family: 'DM Sans', sans-serif;
+            cursor: pointer;
+        }
+
+        .lang-select:focus { outline: none; border-color: var(--primary); }
+
+        /* ── FOOTER ── */
+        .footer {
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            padding: 40px 64px;
+            text-align: center;
+        }
+
+        .footer-logo {
+            font-family: 'DM Serif Display', serif;
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+
+        .footer-sub { font-size: 13px; color: var(--text-3); }
+
+        /* ── ANIMATIONS ── */
+        .fade-up {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .fade-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .fade-up:nth-child(2) { transition-delay: 0.1s; }
+        .fade-up:nth-child(3) { transition-delay: 0.2s; }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 900px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+                box-shadow: var(--shadow-lg);
+            }
+
+            .sidebar-overlay.open { display: block; }
+
+            .main { margin-left: 0; }
+
+            .topbar { display: flex; }
+
+            .hero-content { padding: 80px 24px 48px; }
+            .hero-image { display: none; }
+            .hero h1 { font-size: 44px; }
+
+            .section { padding: 48px 24px; }
+            .prayer-grid { grid-template-columns: repeat(3, 1fr); }
+            .prayer-item { border-bottom: 1px solid var(--border); }
+            .services-grid { grid-template-columns: 1fr; }
+            .gallery-grid { grid-template-columns: 1fr 1fr; }
+            .gallery-item:first-child { grid-column: span 2; }
+            .donate-layout { grid-template-columns: 1fr; }
+            .contact-layout { grid-template-columns: 1fr; }
+            .prayer-full-grid { grid-template-columns: repeat(2, 1fr); }
+            .stats-row { grid-template-columns: 1fr; }
+            .page-hero { padding: 80px 24px 40px; }
+            .footer { padding: 32px 24px; }
+
+            .settings-panel { right: 16px; bottom: 76px; }
+            .settings-btn { right: 16px; bottom: 16px; }
+        }
+
+        @media (max-width: 600px) {
+            .prayer-grid { grid-template-columns: repeat(2, 1fr); }
+            .gallery-grid { grid-template-columns: 1fr; }
+            .gallery-item:first-child { grid-column: span 1; }
+            .amount-grid { grid-template-columns: repeat(2, 1fr); }
+            .prayer-full-grid { grid-template-columns: 1fr 1fr; }
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-3);
+            grid-column: 1/-1;
+        }
+
+        #successMessage p {
+            padding: 14px 20px;
+            background: var(--primary-ultra);
+            color: var(--primary);
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            font-size: 15px;
+            margin-top: 12px;
+            border: 1px solid rgba(26,94,74,0.2);
+        }
+
+        /* Quran quote strip */
+        .quran-strip {
+            background: var(--primary);
+            color: white;
+            padding: 40px 64px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quran-strip::before {
+            content: '"';
+            position: absolute;
+            top: -20px; left: 32px;
+            font-family: 'DM Serif Display', serif;
+            font-size: 180px;
+            opacity: 0.08;
+            color: white;
+            line-height: 1;
+        }
+
+        .quran-text {
+            font-family: 'DM Serif Display', serif;
+            font-size: clamp(22px, 3vw, 32px);
+            font-style: italic;
+            margin-bottom: 12px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .quran-ref {
+            font-size: 13px;
+            opacity: 0.7;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        /* Horizontal dividers */
+        .h-div {
+            height: 1px;
+            background: var(--border);
+            margin: 0 64px;
+        }
+    </style>
+</head>
+<body data-theme="light" lang="en">
+
+    <!-- SIDEBAR OVERLAY -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+    <!-- TOPBAR (mobile) -->
+    <div class="topbar">
+        <button class="hamburger-btn" onclick="openSidebar()" aria-label="Menu">
+            <span></span><span></span><span></span>
+        </button>
+        <div class="topbar-brand">🕌 <span data-translate="mosque_name">Baitul Mukarram</span></div>
+        <div style="width:36px;"></div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <div class="brand-icon">🕌</div>
+            <div class="brand-name" data-translate="mosque_name">Baitul Mukarram</div>
+            <div class="brand-sub">Jame Masjid · Philadelphia</div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-label">Navigation</div>
+            <button class="nav-item active" onclick="showPage('home')" data-page="home">
+                <span class="nav-icon">🏠</span>
+                <span data-translate="home">Home</span>
+            </button>
+            <button class="nav-item" onclick="showPage('prayer')" data-page="prayer">
+                <span class="nav-icon">🌙</span>
+                <span data-translate="prayer_times">Prayer Times</span>
+            </button>
+            <button class="nav-item" onclick="showPage('events')" data-page="events">
+                <span class="nav-icon">📅</span>
+                <span data-translate="events">Events</span>
+            </button>
+            <button class="nav-item" onclick="showPage('gallery')" data-page="gallery">
+                <span class="nav-icon">🖼️</span>
+                <span data-translate="gallery">Gallery</span>
+            </button>
+            <button class="nav-item" onclick="showPage('contact')" data-page="contact">
+                <span class="nav-icon">✉️</span>
+                <span data-translate="contact">Contact</span>
+            </button>
+
+            <div class="nav-label" style="margin-top: 16px;">Community</div>
+            <button class="nav-item" onclick="showPage('prayer')" data-page="none">
+                <span class="nav-icon">📖</span>
+                <span>Quran Classes</span>
+            </button>
+        </nav>
+
+        <div style="padding: 0 12px 12px;">
+            <button class="nav-donate" onclick="showPage('donate')">
+                <span>🤲</span>
+                <span data-translate="donate">Donate Now</span>
+            </button>
+        </div>
+
+        <div class="sidebar-footer">
+            <div style="font-size: 12px; color: var(--text-3); text-align: center; line-height: 1.5;">
+                18 S 43rd St, Philadelphia PA<br>
+                <a href="tel:2676486453" style="color: var(--primary); text-decoration: none;">(267) 648-6453</a>
+            </div>
+        </div>
+    </aside>
+
+    <!-- SETTINGS BUTTON -->
+    <button class="settings-btn" onclick="toggleSettings()" id="settingsToggleBtn" aria-label="Settings">⚙️</button>
+
+    <!-- SETTINGS PANEL -->
+    <div class="settings-panel" id="settingsPanel">
+        <div class="settings-title" data-translate="settings">Settings</div>
+
+        <div class="setting-block">
+    <span class="setting-label" data-translate="theme">Theme</span>
+    <div class="theme-toggle">
+        <button class="theme-btn active" onclick="setTheme('light')" id="lightBtn" data-translate="light">☀️ Light</button>
+        <button class="theme-btn" onclick="setTheme('dark')" id="darkBtn" data-translate="dark">🌙 Dark</button>
+    </div>
+</div>
+
+<div class="setting-block">
+    <span class="setting-label">Animations</span>
+    <div class="theme-toggle">
+        <button class="theme-btn active" onclick="setAnimations(true)" id="animOnBtn">
+            ✨ Enabled
+        </button>
+        <button class="theme-btn" onclick="setAnimations(false)" id="animOffBtn">
+            ⏸ Disabled
+        </button>
+    </div>
+</div>
+
+        <div class="setting-block">
+            <span class="setting-label" data-translate="language">Language</span>
+            <select class="lang-select" onchange="setLanguage(this.value)" id="languageSelect">
+                <option value="en">English</option>
+                <option value="bn">বাংলা (Bangla)</option>
+                <option value="ar">العربية (Arabic)</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <main class="main">
+
+        <!-- ═══ HOME PAGE ═══ -->
+        <div id="home" class="page active">
+
+            <!-- Hero -->
+            <section class="hero">
+                <div class="hero-bg"></div>
+                <div class="hero-pattern"></div>
+                <div class="hero-content">
+                    <div class="hero-badge">📍 West Philadelphia, PA</div>
+                    <h1>Where <em>Faith</em> Meets<br>Community</h1>
+                    <p data-translate="hero_subtitle">Baitul Mukarram Jame Masjid serves the Muslim community in Philadelphia with dedication to Islamic teachings and community welfare.</p>
+                    <div class="hero-actions">
+                        <button class="btn btn-primary" onclick="showPage('prayer')">🌙 <span data-translate="view_prayer">Prayer Times</span></button>
+                        <button class="btn btn-outline" onclick="showPage('donate')"><span data-translate="support">Support Our Mosque</span></button>
+                    </div>
+                </div>
+                <div class="hero-image">
+    <img
+        src="https://lh3.googleusercontent.com/p/AF1QipO7Bu84QrecgVkyKijaFLXimiAqRvMyOaSoKkwI=s1360-w1360-h1020-rw"
+        alt="Baitul Mukarram Jame Masjid"
+    >
+</div>
+            </section>
+
+            <!-- Stats -->
+            <section class="section" style="padding-bottom: 0;">
+                <div class="stats-row fade-up">
+                    <div class="stat-item">
+                        <div class="stat-num">500+</div>
+                        <div class="stat-label">Community Members</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-num">5×</div>
+                        <div class="stat-label">Daily Prayers Held</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-num">20+</div>
+                        <div class="stat-label">Years Serving Philadelphia</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Prayer Times -->
+            <section class="section fade-up">
+                <div class="section-eyebrow">Today's Schedule</div>
+                <div class="section-title" data-translate="today_prayer">Prayer Times</div>
+                <p class="section-sub" data-translate="updated_daily">Updated daily for Philadelphia, PA. Join us for congregation.</p>
+                <div class="prayer-strip">
+                    <div class="prayer-grid" id="homePrayers">
+                        <div class="loading" data-translate="loading">Loading prayer times…</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quran Strip -->
+            <div class="quran-strip">
+                <div class="quran-text">"Indeed, prayer has been decreed upon the believers a decree of specified times."</div>
+                <div class="quran-ref">Surah An-Nisa 4:103</div>
+            </div>
+
+            <!-- Services -->
+            <section class="section fade-up">
+                <div class="section-eyebrow">What We Offer</div>
+                <div class="section-title" data-translate="our_services">Our Services</div>
+                <p class="section-sub" data-translate="services_subtitle">Enriching lives through faith, education, and community bonds.</p>
+                <div class="services-grid">
+                    <div class="service-card fade-up">
+                        <div class="service-icon-wrap">📖</div>
+                        <h3 data-translate="education">Islamic Education</h3>
+                        <p data-translate="education_desc">Comprehensive weekend classes for all ages including Quran recitation and Arabic language.</p>
+                    </div>
+                    <div class="service-card fade-up">
+                        <div class="service-icon-wrap">🤝</div>
+                        <h3 data-translate="community">Community Events</h3>
+                        <p data-translate="community_desc">Regular gatherings and lectures designed to strengthen bonds within our community.</p>
+                    </div>
+                    <div class="service-card fade-up">
+                        <div class="service-icon-wrap">💝</div>
+                        <h3>Support Services</h3>
+                        <p data-translate="support_desc">Marriage counseling, funeral arrangements, and assistance for those in need.</p>
+                    </div>
+                </div>
+            </section>
+
+            <div class="footer">
+                <div class="footer-logo">🕌 <span data-translate="mosque_name">Baitul Mukarram Jame Masjid</span></div>
+                <div class="footer-sub">&copy; 2026 · 18 S 43rd St, Philadelphia, PA 19104 · <span data-translate="rights">All rights reserved.</span></div>
+            </div>
+        </div>
+
+        <!-- ═══ PRAYER TIMES PAGE ═══ -->
+        <div id="prayer" class="page">
+            <div class="page-hero">
+                <div class="page-hero-eyebrow">Daily Schedule</div>
+                <h1 data-translate="prayer_times">Prayer Times</h1>
+                <p data-translate="accurate_times">Accurate prayer times for Philadelphia, Pennsylvania</p>
+            </div>
+
+            <section class="section">
+                <div class="prayer-full-card fade-up">
+                    <div class="prayer-full-header">
+                        <div>
+                            <h2 id="prayerDate">Loading…</h2>
+                            <p id="hijriDate">Hijri Date</p>
+                        </div>
+                        <div style="font-size: 48px; opacity: 0.6;">🕌</div>
+                    </div>
+                    <div class="prayer-full-grid" id="fullPrayers">
+                        <div class="loading">Loading…</div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="footer">
+                <div class="footer-sub">&copy; 2026 Baitul Mukarram Jame Masjid</div>
+            </div>
+        </div>
+
+        <!-- ═══ EVENTS PAGE ═══ -->
+        <div id="events" class="page">
+            <div class="page-hero">
+                <div class="page-hero-eyebrow">Community</div>
+                <h1 data-translate="events">Events</h1>
+                <p>Stay connected with our gatherings and programs</p>
+            </div>
+
+            <section class="section">
+                <div style="display: grid; grid-template-columns: 1fr 340px; gap: 40px; align-items: start;">
+                    <div>
+                        <div class="section-eyebrow">What's Coming</div>
+                        <div class="section-title" style="font-size: 32px; margin-bottom: 28px;">Upcoming Events</div>
+                        <div class="event-list" id="eventsList"></div>
+                    </div>
+                    <div>
+                        <div class="calendar-wrap">
+                            <div class="calendar-header">
+                                <button class="cal-btn" onclick="changeMonth(-1)">‹</button>
+                                <div class="calendar-title" id="calendarTitle"></div>
+                                <button class="cal-btn" onclick="changeMonth(1)">›</button>
+                            </div>
+                            <div class="calendar-grid-wrap">
+                                <div class="cal-days-header">
+                                    <div class="cal-day-label">Su</div>
+                                    <div class="cal-day-label">Mo</div>
+                                    <div class="cal-day-label">Tu</div>
+                                    <div class="cal-day-label">We</div>
+                                    <div class="cal-day-label">Th</div>
+                                    <div class="cal-day-label">Fr</div>
+                                    <div class="cal-day-label">Sa</div>
+                                </div>
+                                <div class="cal-grid" id="calendarGrid"></div>
+                            </div>
+                        </div>
+                        <div style="font-size: 12px; color: var(--text-3); padding: 12px; display: flex; align-items: center; gap: 8px;">
+                            <span style="width:8px;height:8px;background:var(--accent);border-radius:50%;display:inline-block;"></span>
+                            Gold dot = event day
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="footer">
+                <div class="footer-sub">&copy; 2026 Baitul Mukarram Jame Masjid</div>
+            </div>
+        </div>
+
+        <!-- ═══ GALLERY PAGE ═══ -->
+        <div id="gallery" class="page">
+            <div class="page-hero">
+                <div class="page-hero-eyebrow">Our Moments</div>
+                <h1 data-translate="gallery">Gallery</h1>
+                <p>Snapshots from our growing community</p>
+            </div>
+
+            <section class="section">
+                <div class="gallery-grid fade-up">
+                    <div class="gallery-item">
+                        <div class="gallery-placeholder">🕌</div>
+                        <div class="gallery-overlay"></div>
+                        <div class="gallery-label">Main Prayer Hall</div>
+                    </div>
+                    <div class="gallery-item">
+                        <div class="gallery-placeholder">📖</div>
+                        <div class="gallery-overlay"></div>
+                        <div class="gallery-label">Quran Classes</div>
+                    </div>
+                    <div class="gallery-item">
+                        <div class="gallery-placeholder">🤲</div>
+                        <div class="gallery-overlay"></div>
+                        <div class="gallery-label">Eid Celebration</div>
+                    </div>
+                    <div class="gallery-item">
+                        <div class="gallery-placeholder">🌙</div>
+                        <div class="gallery-overlay"></div>
+                        <div class="gallery-label">Ramadan Iftar</div>
+                    </div>
+                    <div class="gallery-item">
+                        <div class="gallery-placeholder">👨‍👩‍👧‍👦</div>
+                        <div class="gallery-overlay"></div>
+                        <div class="gallery-label">Family Day</div>
+                    </div>
+                    <div class="gallery-item">
+                        <div class="gallery-placeholder">🎓</div>
+                        <div class="gallery-overlay"></div>
+                        <div class="gallery-label">Youth Graduation</div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="footer">
+                <div class="footer-sub">&copy; 2026 Baitul Mukarram Jame Masjid</div>
+            </div>
+        </div>
+
+        <!-- ═══ DONATE PAGE ═══ -->
+        <div id="donate" class="page">
+            <div class="page-hero">
+                <div class="page-hero-eyebrow">Give Back</div>
+                <h1 data-translate="support_mosque">Support Our Mosque</h1>
+                <p data-translate="generosity">Your generosity helps us serve our community better</p>
+            </div>
+
+            <section class="section">
+                <div class="donate-layout">
+                    <div class="donate-sidebar-info">
+                        <div class="section-eyebrow">Your Impact</div>
+                        <h2>Every Gift<br>Matters</h2>
+                        <p>Your donation directly supports our community programs, maintains our facilities, and helps families in need throughout Philadelphia.</p>
+                        <div class="impact-items">
+                            <div class="impact-item">
+                                <div class="impact-icon">🕌</div>
+                                <div class="impact-text">
+                                    <strong data-translate="general_fund">General Fund</strong>
+                                    <span data-translate="general_desc">Support overall mosque operations</span>
+                                </div>
+                            </div>
+                            <div class="impact-item">
+                                <div class="impact-icon">📚</div>
+                                <div class="impact-text">
+                                    <strong data-translate="education">Islamic Education</strong>
+                                    <span data-translate="education_fund_desc">Fund weekend schools and classes</span>
+                                </div>
+                            </div>
+                            <div class="impact-item">
+                                <div class="impact-icon">🤲</div>
+                                <div class="impact-text">
+                                    <strong data-translate="charity">Charity & Zakat</strong>
+                                    <span data-translate="charity_desc">Help families in need</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="donate-form-card fade-up">
+                        <div class="category-tabs">
+                            <button class="cat-tab active" onclick="selectCategory(this, 'general')" data-translate="general_fund">General</button>
+                            <button class="cat-tab" onclick="selectCategory(this, 'education')" data-translate="education">Education</button>
+                            <button class="cat-tab" onclick="selectCategory(this, 'charity')" data-translate="charity">Charity</button>
+                        </div>
+
+                        <div style="font-size: 13px; font-weight: 700; color: var(--text-3); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 12px;" data-translate="select_amount">Select Amount</div>
+                        <div class="amount-grid">
+                            <button class="amount-btn" onclick="selectAmount(this, 25)">$25</button>
+                            <button class="amount-btn" onclick="selectAmount(this, 50)">$50</button>
+                            <button class="amount-btn selected" onclick="selectAmount(this, 100)">$100</button>
+                            <button class="amount-btn" onclick="selectAmount(this, 250)">$250</button>
+                            <button class="amount-btn" onclick="selectAmount(this, 500)">$500</button>
+                            <button class="amount-btn" onclick="selectAmount(this, 1000)">$1K</button>
+                        </div>
+
+                        <div class="form-group" style="position:relative;">
+                            <span style="position:absolute;left:16px;top:12px;color:var(--text-3);font-weight:700;">$</span>
+                            <input type="number" class="form-input" id="customAmount" placeholder="Custom amount" min="1" style="padding-left: 32px;">
+                        </div>
+
+                        <form id="donationForm">
+                            <div class="form-group">
+                                <label data-translate="full_name">Full Name</label>
+                                <input type="text" id="donorName" class="form-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label data-translate="email">Email Address</label>
+                                <input type="email" id="donorEmail" class="form-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label data-translate="card_info">Card Information</label>
+                                <div id="card-element"></div>
+                                <div id="card-errors" role="alert" style="color:#e5534b;font-size:13px;margin-top:6px;"></div>
+                            </div>
+                            <button type="submit" class="submit-btn" id="submitBtn" data-translate="complete_donation">Complete Donation →</button>
+                            <div id="successMessage"></div>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <div class="footer">
+                <div class="footer-sub">&copy; 2026 Baitul Mukarram Jame Masjid</div>
+            </div>
+        </div>
+
+        <!-- ═══ CONTACT PAGE ═══ -->
+        <div id="contact" class="page">
+            <div class="page-hero">
+                <div class="page-hero-eyebrow">Get In Touch</div>
+                <h1 data-translate="contact">Contact Us</h1>
+                <p data-translate="contact_subtitle">We'd love to hear from you</p>
+            </div>
+
+            <section class="section">
+                <div class="contact-layout">
+                    <div class="contact-info">
+                        <div class="info-card">
+                            <div class="info-icon">📍</div>
+                            <div>
+                                <div class="info-label" data-translate="visit">Visit Us</div>
+                                <div class="info-val">18 S 43rd St<br>Philadelphia, PA 19104</div>
+                            </div>
+                        </div>
+                        <div class="info-card">
+                            <div class="info-icon">📞</div>
+                            <div>
+                                <div class="info-label" data-translate="call">Call Us</div>
+                                <div class="info-val"><a href="tel:2676486453">(267) 648-6453</a></div>
+                            </div>
+                        </div>
+                        <div class="info-card">
+                            <div class="info-icon">🕐</div>
+                            <div>
+                                <div class="info-label">Office Hours</div>
+                                <div class="info-val">Mon–Fri: 9 AM – 5 PM<br>Weekends: By appointment</div>
+                            </div>
+                        </div>
+                        <div class="map-card">
+                            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3058.4427476937786!2d-75.21064!3d39.95553!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c6c65d8f2e07d3%3A0x54321!2s18%20S%2043rd%20St%2C%20Philadelphia%2C%20PA%2019104!5e0!3m2!1sen!2sus!4v1234567890" allowfullscreen="" loading="lazy"></iframe>
+                        </div>
+                    </div>
+
+                    <div class="contact-form-card fade-up">
+                        <h3 data-translate="send_message">Send a Message</h3>
+                        <form onsubmit="handleContact(event)">
+                            <div class="form-group">
+                                <label data-translate="full_name">Full Name</label>
+                                <input type="text" class="form-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label data-translate="email">Email Address</label>
+                                <input type="email" class="form-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label data-translate="message">Message</label>
+                                <textarea class="form-input" required></textarea>
+                            </div>
+                            <button type="submit" class="submit-btn" data-translate="send">Send Message →</button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <div class="footer">
+                <div class="footer-sub">&copy; 2026 Baitul Mukarram Jame Masjid · <span data-translate="rights">All rights reserved.</span></div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        /* ── TRANSLATIONS ── */
+        /* ── ANIMATION SETTINGS ── */
+let animationsEnabled = localStorage.getItem('animations') !== 'off';
+
+function setAnimations(enabled) {
+    animationsEnabled = enabled;
+
+    if (enabled) {
+        document.body.classList.remove('animations-disabled');
+        document.getElementById('animOnBtn').classList.add('active');
+        document.getElementById('animOffBtn').classList.remove('active');
+        localStorage.setItem('animations', 'on');
+    } else {
+        document.body.classList.add('animations-disabled');
+        document.getElementById('animOnBtn').classList.remove('active');
+        document.getElementById('animOffBtn').classList.add('active');
+        localStorage.setItem('animations', 'off');
+    }
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+    setAnimations(animationsEnabled);
+});
+        const translations = {
+            en: {
+                settings:"Settings",theme:"Theme",light:"☀️ Light",dark:"🌙 Dark",language:"Language",
+                mosque_name:"Baitul Mukarram",home:"Home",prayer_times:"Prayer Times",events:"Events",
+                gallery:"Gallery",contact:"Contact",donate:"Donate Now",
+                hero_subtitle:"Baitul Mukarram Jame Masjid serves the Muslim community in Philadelphia with dedication to Islamic teachings and community welfare.",
+                view_prayer:"Prayer Times",support:"Support Our Mosque",
+                today_prayer:"Today's Prayer Times",updated_daily:"Updated daily for Philadelphia, PA",
+                loading:"Loading prayer times…",our_services:"Our Services",
+                services_subtitle:"Enriching lives through faith and community",
+                education:"Islamic Education",education_desc:"Comprehensive weekend classes for all ages including Quran recitation and Arabic language.",
+                community:"Community Events",community_desc:"Regular gatherings and lectures designed to strengthen bonds within our community.",
+                support_desc:"Marriage counseling, funeral arrangements, and assistance for those in need.",
+                accurate_times:"Accurate prayer times for Philadelphia, Pennsylvania",
+                support_mosque:"Support Our Mosque",generosity:"Your generosity helps us serve our community better",
+                general_fund:"General Fund",general_desc:"Support overall mosque operations",
+                education_fund_desc:"Fund weekend schools and classes",charity:"Charity & Zakat",charity_desc:"Help families in need",
+                select_amount:"Select Amount",full_name:"Full Name",email:"Email Address",
+                card_info:"Card Information",complete_donation:"Complete Donation",
+                contact_subtitle:"We'd love to hear from you",visit:"Visit Us",call:"Call Us",
+                send_message:"Send a Message",message:"Message",send:"Send Message",rights:"All rights reserved."
+            },
+            bn: {
+                settings:"সেটিংস",theme:"থিম",light:"☀️ আলো",dark:"🌙 অন্ধকার",language:"ভাষা",
+                mosque_name:"বাইতুল মোকাররম জামে মসজিদ",home:"হোম",prayer_times:"নামাজের সময়",events:"ইভেন্ট",
+                gallery:"গ্যালারি",contact:"যোগাযোগ",donate:"দান করুন",
+                hero_subtitle:"বাইতুল মোকাররম জামে মসজিদ ফিলাডেলফিয়ার মুসলিম সম্প্রদায়কে ইসলামী শিক্ষা ও সম্প্রদায় কল্যাণে নিবেদিত।",
+                view_prayer:"নামাজের সময় দেখুন",support:"আমাদের মসজিদ সমর্থন করুন",
+                today_prayer:"আজকের নামাজের সময়",updated_daily:"ফিলাডেলফিয়া, PA এর জন্য প্রতিদিন আপডেট করা হয়",
+                loading:"নামাজের সময় লোড হচ্ছে...",our_services:"আমাদের সেবা",
+                services_subtitle:"বিশ্বাস এবং সম্প্রদায়ের মাধ্যমে জীবন সমৃদ্ধ করা",
+                education:"ইসলামী শিক্ষা",education_desc:"কুরআন তেলাওয়াত এবং আরবি ভাষা সহ সব বয়সের জন্য ব্যাপক সাপ্তাহিক ক্লাস।",
+                community:"সম্প্রদায় ইভেন্ট",community_desc:"আমাদের সম্প্রদায়ের মধ্যে বন্ধন শক্তিশালী করার জন্য নিয়মিত সমাবেশ এবং বক্তৃতা।",
+                support_desc:"বিবাহ পরামর্শ, জানাজার ব্যবস্থা এবং প্রয়োজনে সহায়তা।",
+                accurate_times:"ফিলাডেলফিয়া, পেনসিলভানিয়ার জন্য সঠিক নামাজের সময়",
+                support_mosque:"আমাদের মসজিদ সমর্থন করুন",generosity:"আপনার উদারতা আমাদের সম্প্রদায়কে আরও ভাল সেবা করতে সাহায্য করে",
+                general_fund:"সাধারণ তহবিল",general_desc:"সামগ্রিক মসজিদ পরিচালনা সমর্থন করুন",
+                education_fund_desc:"সাপ্তাহিক স্কুল এবং ক্লাসের জন্য তহবিল",charity:"দাতব্য ও যাকাত",charity_desc:"প্রয়োজনে পরিবারকে সাহায্য করুন",
+                select_amount:"পরিমাণ নির্বাচন করুন",full_name:"পূর্ণ নাম",email:"ইমেইল ঠিকানা",
+                card_info:"কার্ড তথ্য",complete_donation:"দান সম্পূর্ণ করুন",
+                contact_subtitle:"আমরা আপনার কাছ থেকে শুনতে চাই",visit:"আমাদের দেখুন",call:"আমাদের কল করুন",
+                send_message:"একটি বার্তা পাঠান",message:"বার্তা",send:"বার্তা পাঠান",rights:"সর্বস্বত্ব সংরক্ষিত।"
+            },
+            ar: {
+                settings:"الإعدادات",theme:"السمة",light:"☀️ فاتح",dark:"🌙 داكن",language:"اللغة",
+                mosque_name:"بيت المكرم جامع مسجد",home:"الرئيسية",prayer_times:"مواقيت الصلاة",events:"الفعاليات",
+                gallery:"المعرض",contact:"اتصل بنا",donate:"تبرع",
+                hero_subtitle:"يخدم مسجد بيت المكرم المجتمع المسلم في فيلادلفيا بتفانٍ للتعاليم الإسلامية ورعاية المجتمع.",
+                view_prayer:"عرض مواقيت الصلاة",support:"ادعم مسجدنا",
+                today_prayer:"مواقيت الصلاة اليوم",updated_daily:"يتم التحديث يوميًا لفيلادلفيا",
+                loading:"جاري تحميل مواقيت الصلاة...",our_services:"خدماتنا",
+                services_subtitle:"إثراء الحياة من خلال الإيمان والمجتمع",
+                education:"التعليم الإسلامي",education_desc:"دروس شاملة في عطلة نهاية الأسبوع لجميع الأعمار.",
+                community:"فعاليات المجتمع",community_desc:"تجمعات ومحاضرات منتظمة.",
+                support_desc:"الاستشارات الزوجية، ترتيبات الجنازة، والمساعدة للمحتاجين.",
+                accurate_times:"مواقيت صلاة دقيقة لفيلادلفيا",
+                support_mosque:"ادعم مسجدنا",generosity:"كرمك يساعدنا على خدمة مجتمعنا",
+                general_fund:"الصندوق العام",general_desc:"دعم عمليات المسجد الشاملة",
+                education_fund_desc:"تمويل المدارس والفصول الدراسية",charity:"الصدقة والزكاة",charity_desc:"مساعدة العائلات المحتاجة",
+                select_amount:"اختر المبلغ",full_name:"الاسم الكامل",email:"عنوان البريد الإلكتروني",
+                card_info:"معلومات البطاقة",complete_donation:"إكمال التبرع",
+                contact_subtitle:"نحب أن نسمع منك",visit:"زرنا",call:"اتصل بنا",
+                send_message:"أرسل رسالة",message:"رسالة",send:"إرسال رسالة",rights:"جميع الحقوق محفوظة."
+            }
+        };
+
+        /* ── SIDEBAR ── */
+        function openSidebar() {
+            document.getElementById('sidebar').classList.add('open');
+            document.getElementById('sidebarOverlay').classList.add('open');
+        }
+        function closeSidebar() {
+            document.getElementById('sidebar').classList.remove('open');
+            document.getElementById('sidebarOverlay').classList.remove('open');
+        }
+
+        /* ── SETTINGS ── */
+        function toggleSettings() {
+            document.getElementById('settingsPanel').classList.toggle('active');
+        }
+
+        document.addEventListener('click', e => {
+            const panel = document.getElementById('settingsPanel');
+            const btn = document.getElementById('settingsToggleBtn');
+            if (!panel.contains(e.target) && !btn.contains(e.target)) {
+                panel.classList.remove('active');
+            }
+        });
+
+        function setTheme(theme) {
+            document.body.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            document.getElementById('lightBtn').classList.toggle('active', theme === 'light');
+            document.getElementById('darkBtn').classList.toggle('active', theme === 'dark');
+        }
+
+        let currentLang = 'en';
+        function setLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('language', lang);
+            document.getElementById('languageSelect').value = lang;
+            document.body.setAttribute('lang', lang);
+            document.body.style.direction = lang === 'ar' ? 'rtl' : 'ltr';
+            document.querySelectorAll('[data-translate]').forEach(el => {
+                const key = el.getAttribute('data-translate');
+                if (translations[lang]?.[key]) el.textContent = translations[lang][key];
+            });
+        }
+
+        /* ── PAGE NAVIGATION ── */
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            const target = document.getElementById(pageId);
+            if (target) { target.classList.add('active'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.toggle('active', item.getAttribute('data-page') === pageId);
+            });
+
+            closeSidebar();
+            setTimeout(initScrollAnimations, 100);
+        }
+
+        /* ── PRAYER TIMES ── */
+        const prayerIcons = { Fajr:'🌙', Sunrise:'🌅', Dhuhr:'☀️', Asr:'🌤️', Maghrib:'🌇', Isha:'🌃' };
+
+        function formatTime(time) {
+            if (!time) return '--:--';
+            const [h, m] = time.split(':').map(Number);
+            const ampm = h >= 12 ? 'PM' : 'AM';
+            const hour = h % 12 || 12;
+            return `${hour}:${m.toString().padStart(2,'0')} ${ampm}`;
+        }
+
+        function getCurrentPrayer(timings) {
+            const now = new Date();
+            const mins = now.getHours() * 60 + now.getMinutes();
+            const prayerNames = ['Fajr','Sunrise','Dhuhr','Asr','Maghrib','Isha'];
+            let current = 'Isha';
+            for (let name of prayerNames) {
+                const [h, m] = (timings[name] || '0:0').split(':').map(Number);
+                if (mins >= h * 60 + m) current = name;
+            }
+            return current;
+        }
+
+        async function loadPrayerTimes() {
+            try {
+                const res = await fetch('https://api.aladhan.com/v1/timingsByCity?city=Philadelphia&country=US&method=2');
+                const data = await res.json();
+                const timings = data.data.timings;
+                const date = data.data.date;
+                const current = getCurrentPrayer(timings);
+
+                const dateEl = document.getElementById('prayerDate');
+                const hijriEl = document.getElementById('hijriDate');
+                if (dateEl) dateEl.textContent = date.readable;
+                if (hijriEl) hijriEl.textContent = `${date.hijri.day} ${date.hijri.month.en} ${date.hijri.year} AH`;
+
+                const prayerNames = ['Fajr','Sunrise','Dhuhr','Asr','Maghrib','Isha'];
+
+                // Home strip
+                const homeHtml = prayerNames.map(name => `
+                    <div class="prayer-item ${name === current ? 'current' : ''}">
+                        <span class="prayer-icon">${prayerIcons[name]}</span>
+                        <div class="prayer-name">${name}</div>
+                        <div class="prayer-time">${formatTime(timings[name])}</div>
+                    </div>`).join('');
+                const homeEl = document.getElementById('homePrayers');
+                if (homeEl) homeEl.innerHTML = homeHtml;
+
+                // Full page grid
+                const fullHtml = prayerNames.map(name => `
+                    <div class="prayer-full-item ${name === current ? 'current' : ''}">
+                        <span class="prayer-icon" style="font-size:36px;display:block;margin-bottom:12px;">${prayerIcons[name]}</span>
+                        <div class="prayer-name">${name}</div>
+                        <div class="prayer-time" style="font-size:36px;margin-top:8px;">${formatTime(timings[name])}</div>
+                        ${name === current ? '<div style="font-size:11px;color:var(--primary);font-weight:700;letter-spacing:0.08em;text-transform:uppercase;margin-top:8px;">Current</div>' : ''}
+                    </div>`).join('');
+                const fullEl = document.getElementById('fullPrayers');
+                if (fullEl) fullEl.innerHTML = fullHtml;
+            } catch {
+                const fb = '<div class="loading">Could not load prayer times. Please try again later.</div>';
+                ['homePrayers','fullPrayers'].forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = fb; });
+            }
+        }
+
+        /* ── DONATION ── */
+        let selectedAmount = 100, selectedCategory = 'general';
+
+        function selectAmount(btn, amount) {
+            document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            selectedAmount = amount;
+            document.getElementById('customAmount').value = '';
+        }
+
+        function selectCategory(el, cat) {
+            document.querySelectorAll('.cat-tab').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+            selectedCategory = cat;
+        }
+
+        const donationForm = document.getElementById('donationForm');
+        if (donationForm) {
+            donationForm.addEventListener('submit', e => {
+                e.preventDefault();
+                const btn = document.getElementById('submitBtn');
+                const msg = document.getElementById('successMessage');
+                const customVal = document.getElementById('customAmount').value;
+                const amount = customVal ? parseFloat(customVal) : selectedAmount;
+                btn.disabled = true;
+                btn.textContent = 'Processing…';
+                setTimeout(() => {
+                    btn.disabled = false;
+                    btn.textContent = 'Complete Donation →';
+                    msg.innerHTML = `<p>✅ JazakAllah Khair! Your $${amount} donation to ${selectedCategory} has been received.</p>`;
+                    donationForm.reset();
+                    document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('selected'));
+                    document.querySelector('.amount-btn:nth-child(3)').classList.add('selected');
+                }, 1500);
+            });
+        }
+
+        /* ── CONTACT ── */
+        function handleContact(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('.submit-btn');
+            btn.textContent = 'Message Sent ✅';
+            setTimeout(() => { btn.textContent = 'Send Message →'; e.target.reset(); }, 3000);
+        }
+
+        /* ── CALENDAR & EVENTS ── */
+        const mosqueEvents = [
+            { date:'2026-03-21', title:"Jumu'ah Khutbah", time:'1:15 PM', desc:'Weekly Friday sermon and prayer.', icon:'🕌' },
+            { date:'2026-03-28', title:"Jumu'ah Khutbah", time:'1:15 PM', desc:'Weekly Friday sermon and prayer.', icon:'🕌' },
+            { date:'2026-04-04', title:'Community Iftar', time:'7:30 PM', desc:'Join us for a community iftar dinner.', icon:'🌙' },
+            { date:'2026-04-10', title:'Quran Recitation Competition', time:'6:00 PM', desc:'Youth Quran competition open to all ages.', icon:'📖' },
+            { date:'2026-04-18', title:'Islamic Studies Workshop', time:'10:00 AM', desc:'Monthly workshop for adults on Islamic jurisprudence.', icon:'📚' },
+            { date:'2026-04-25', title:'Family Fun Day', time:'12:00 PM', desc:'Games, food, and activities for the whole family.', icon:'👨‍👩‍👧‍👦' },
+            { date:'2026-05-02', title:'Eid al-Adha Celebration', time:'8:00 AM', desc:'Eid prayer followed by community lunch.', icon:'🎉' },
+            { date:'2026-05-15', title:'Charity Fundraiser', time:'6:30 PM', desc:'Annual fundraiser dinner supporting local families.', icon:'🤲' },
+        ];
+
+        let calendarDate = new Date();
+
+        function renderCalendar() {
+            const year = calendarDate.getFullYear();
+            const month = calendarDate.getMonth();
+            const today = new Date();
+            const titleEl = document.getElementById('calendarTitle');
+            const gridEl = document.getElementById('calendarGrid');
+            const eventsEl = document.getElementById('eventsList');
+            if (!titleEl || !gridEl) return;
+
+            titleEl.textContent = calendarDate.toLocaleString('default', { month:'long', year:'numeric' });
+
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month+1, 0).getDate();
+            const eventDates = new Set(mosqueEvents.map(e => e.date));
+
+            let html = '';
+            for (let i = 0; i < firstDay; i++) html += '<div></div>';
+            for (let d = 1; d <= daysInMonth; d++) {
+                const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+                const isToday = d === today.getDate() && month === today.getMonth() && year === today.getFullYear();
+                const hasEvent = eventDates.has(dateStr);
+                html += `<div class="calendar-day ${isToday?'today':''} ${hasEvent?'has-event':''}">${d}</div>`;
+            }
+            gridEl.innerHTML = html;
+
+            if (!eventsEl) return;
+            const upcoming = mosqueEvents
+                .filter(e => new Date(e.date+'T23:59:59') >= today)
+                .sort((a,b) => new Date(a.date) - new Date(b.date));
+
+            eventsEl.innerHTML = upcoming.length ? upcoming.map(e => {
+                const d = new Date(e.date+'T12:00:00');
+                const day = d.getDate();
+                const mon = d.toLocaleString('default', { month:'short' });
+                const label = d.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
+                return `<div class="event-card">
+                    <div class="event-date-badge">
+                        <div class="event-date-day">${day}</div>
+                        <div class="event-date-mon">${mon}</div>
+                    </div>
+                    <span class="event-icon">${e.icon}</span>
+                    <div class="event-info">
+                        <div class="event-title">${e.title}</div>
+                        <div class="event-meta">${label} · ${e.time}</div>
+                    </div>
+                </div>`;
+            }).join('') : '<p style="color:var(--text-3);padding:32px;text-align:center;">No upcoming events.</p>';
+        }
+
+        function changeMonth(dir) {
+            calendarDate.setMonth(calendarDate.getMonth() + dir);
+            renderCalendar();
+        }
+
+        /* ── SCROLL ANIMATIONS ── */
+        function initScrollAnimations() {
+            const obs = new IntersectionObserver(entries => {
+                entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+            }, { threshold: 0.08 });
+            document.querySelectorAll('.fade-up').forEach(el => obs.observe(el));
+        }
+
+        /* ── INIT ── */
+        document.addEventListener('DOMContentLoaded', () => {
+            setTheme(localStorage.getItem('theme') || 'light');
+            setLanguage(localStorage.getItem('language') || 'en');
+            loadPrayerTimes();
+            renderCalendar();
+            initScrollAnimations();
+        });
+    </script>
+</body>
+</html>
